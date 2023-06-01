@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MyLeasing.Web.Data.Entities
 {
-    public class Owner
+    public class Owner : IEntity
     {
        
         public int Id { get; set; }
