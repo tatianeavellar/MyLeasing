@@ -32,7 +32,7 @@ namespace MyLeasing.Web
 
             services.AddTransient<SeedDb>();
 
-
+            services.AddScoped<IRepository, Repository>();
 
             services.AddControllersWithViews();
         }
