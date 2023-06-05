@@ -1,11 +1,11 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace MyLeasing.Web.Data.Entities
 {
-    public class Owner : IEntity
+    public class User : IdentityUser
     {
-       
         public int Id { get; set; }
 
         [DisplayName("Document*")]
@@ -23,18 +23,14 @@ namespace MyLeasing.Web.Data.Entities
         [Required(ErrorMessage = "The field {0} is mandatory.")]
         public string LastName { get; set; }
 
-        [DisplayName("Fixed Phone")]
-        public int? FixedPhone { get; set; }
-
-        [DisplayName("Cell Phone")]
-        public int? CellPhone { get; set; }
-
         [MaxLength(100, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         public string? Address { get; set; }
 
-        [DisplayName("Owner Name")]
-        public string OwnerName => $"{FirstName} {LastName}";
+                
 
-        public User User { get; set; }
+        [DisplayName("Owner Name")]
+        public string FullName => $"{FirstName} {LastName}";
+
+        public string FullNameWithDocument =>$"{FirstName} {LastName} - {Document}";
     }
 }
