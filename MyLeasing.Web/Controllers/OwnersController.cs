@@ -1,27 +1,44 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using MyLeasing.Web.Data;
 using MyLeasing.Web.Data.Entities;
+using MyLeasing.Web.Helpers;
 using MyLeasing.Web.Models;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyLeasing.Web.Controllers
 {
     public class OwnersController : Controller
     {
+        
+        
+        
         private readonly IOwnerRepository _ownerRepository;
+        private readonly IUserHelper _userHelper;
+        private readonly IImageHelper _imageHelper;
+        private readonly IConverterHelper _converterHelper;
 
-        public OwnersController(IOwnerRepository ownerRepository)
+        public OwnersController(IOwnerRepository ownerRepository,
+                                IUserHelper userHelper,
+                                IImageHelper imageHelper,
+                                IConverterHelper converterHelper)
+
+
         {
             _ownerRepository = ownerRepository;
+            _userHelper = userHelper;
+            _imageHelper = imageHelper;
+            _converterHelper = converterHelper;
         }
 
         // GET: Owners
         public IActionResult Index()
         {
-            return View(_ownerRepository.GetAll());
+            return View(_ownerRepository.GetAll().OrderBy(p => p.FirstName)); // Dá-me TODOS os Owners
         }
 
         // GET: Owners/Details/5
@@ -59,54 +76,42 @@ namespace MyLeasing.Web.Controllers
             {
                 var path = string.Empty;
 
-                if(model.ImageFile != null && model.ImageFile.Length > 0) 
+                if (model.ImageFile != null && model.ImageFile.Length > 0)
                 {
-                    var guid = Guid.NewGuid().ToString();
-                    var file = $"{guid}.jpg";
+                                    
 
-
-                    path = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot\\images\\owners",
-                        file);
-
-                    using(var stream = new FileStream(path, FileMode.Create)) 
-                    { 
-                        await model.ImageFile.CopyToAsync(stream);
-                    }
-
-                    path = $"~/images/owners/{file}";
+                    path = await _imageHelper.UploadImageAsync(model.ImageFile, "owners");
 
                 }
 
-                var owner = this.ToOwner(model, path);
+                var owner = _converterHelper.ToOwner(model, path, true);
 
                 //Todo: modificar para p o user que tiver logado.
 
-                //owner.User = await _userHelper.GetUserByEmailAsync("tatiane.c.r.avellar@gmail.com");
+                owner.User = await _userHelper.GetUserByEmailAsync("tatiane.c.r.avellar@gmail.com");
                 await _ownerRepository.CreateAsync(owner);
-               
+
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
         }
 
-        private Owner ToOwner(OwnerViewModel model, string path)
-        {
-            return new Owner
-            {
-                Id = model.Id,
-                ImageUrl = path,
-                Document = model.Document,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                FixedPhone = model.FixedPhone,
-                CellPhone = model.CellPhone,
-                Address = model.Address,
-                User = model.User
+        //private Owner ToOwner(OwnerViewModel model, string path)
+        //{
+        //    return new Owner
+        //    {
+        //        Id = model.Id,
+        //        ImageUrl = path,
+        //        Document = model.Document,
+        //        FirstName = model.FirstName,
+        //        LastName = model.LastName,
+        //        FixedPhone = model.FixedPhone,
+        //        CellPhone = model.CellPhone,
+        //        Address = model.Address,
+        //        User = model.User
 
-            };
-        }
+        //    };
+        //}
 
         // GET: Owners/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -122,25 +127,25 @@ namespace MyLeasing.Web.Controllers
                 return NotFound();
             }
 
-            var model = this.ToOwnerViewModel(owner); 
+            var model = _converterHelper.ToOwnerViewModel(owner);
             return View(model);
         }
 
-        private OwnerViewModel ToOwnerViewModel(Owner owner)
-        {
-            return new OwnerViewModel
-            {
-                Id = owner.Id,
-                ImageUrl = owner.ImageUrl,
-                Document = owner.Document,
-                FirstName = owner.FirstName,
-                LastName = owner.LastName,
-                FixedPhone = owner.FixedPhone,
-                CellPhone = owner.CellPhone,
-                Address = owner.Address,
-                User = owner.User
-            };
-        }
+        //private OwnerViewModel ToOwnerViewModel(Owner owner)
+        //{
+        //    return new OwnerViewModel
+        //    {
+        //        Id = owner.Id,
+        //        ImageUrl = owner.ImageUrl,
+        //        Document = owner.Document,
+        //        FirstName = owner.FirstName,
+        //        LastName = owner.LastName,
+        //        FixedPhone = owner.FixedPhone,
+        //        CellPhone = owner.CellPhone,
+        //        Address = owner.Address,
+        //        User = owner.User
+        //    };
+        //}
 
 
 
@@ -151,36 +156,25 @@ namespace MyLeasing.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(OwnerViewModel model)
         {
-            
+
             if (ModelState.IsValid)
             {
                 try
                 {
                     var path = model.ImageUrl;
 
-                    if(model.ImageFile != null && model.ImageFile.Length > 0) 
+                    if (model.ImageFile != null && model.ImageFile.Length > 0)
                     {
-                        var guid = Guid.NewGuid().ToString();
-                        var file = $"{guid}.jpg";
 
-                        path = Path.Combine(
-                            Directory.GetCurrentDirectory(),
-                            "wwwroot\\images\\owners",
-                            file);
 
-                        using(var stream = new FileStream(path,FileMode.Create))
-                        {
-                            await model.ImageFile.CopyToAsync(stream);
-                        }
-
-                        path = $"~/images/owners/{file}";
+                        path = await _imageHelper.UploadImageAsync(model.ImageFile, "owners");
                     }
 
-                    var owner = this.ToOwner(model, path);
+                    var owner = _converterHelper.ToOwner(model, path, false);
 
                     //Todo: modificar para p o user que tiver logado.
-                    //owner.User = await _userHelper.GetUserByEmailAsync("tatiane.c.r.avellar@gmail.com");
-                    await _ownerRepository.CreateAsync(owner);
+                    owner.User = await _userHelper.GetUserByEmailAsync("tatiane.c.r.avellar@gmail.com");
+                    await _ownerRepository.UpdateAsync(owner);
 
                 }
                 catch (DbUpdateConcurrencyException)

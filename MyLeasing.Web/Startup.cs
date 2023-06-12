@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -8,10 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MyLeasing.Web.Data;
 using MyLeasing.Web.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using MyLeasing.Web.Helpers;
 
 namespace MyLeasing.Web
 {
@@ -35,7 +31,7 @@ namespace MyLeasing.Web
                 cfg.Password.RequireUppercase = false;
                 cfg.Password.RequireLowercase = false;
                 cfg.Password.RequireNonAlphanumeric = false;
-                cfg.Password.RequiredLength = 6;                
+                cfg.Password.RequiredLength = 6;
             })
                 .AddEntityFrameworkStores<DataContext>();
 
@@ -44,9 +40,18 @@ namespace MyLeasing.Web
                 cfg.UseSqlServer(this.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddTransient<SeedDb>();
+            services.AddTransient<SeedDb>(); // Dependece Injection
 
-            services.AddScoped<IOwnerRepository, OwnerRepository>();
+            services.AddScoped<IUserHelper, UserHelper>();
+
+            services.AddScoped<IImageHelper, ImageHelper>();
+
+            services.AddScoped<IConverterHelper, ConverterHelper>();
+
+            services.AddScoped<IOwnerRepository, OwnerRepository>(); // Dependece Injection // AQUI TROCA PARA O QUE SERÁ IMPLEMENTADO
+                                                                     // SAI O IREPOSITORY, REPOSITORY
+
+            //services.AddScoped<ILesseeRepository, LesseeRepository>();
 
             services.AddControllersWithViews();
         }
@@ -68,6 +73,8 @@ namespace MyLeasing.Web
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

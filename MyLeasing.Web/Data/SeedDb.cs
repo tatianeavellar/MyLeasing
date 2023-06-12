@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.CodeAnalysis;
 using MyLeasing.Web.Data.Entities;
+using MyLeasing.Web.Helpers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,23 +10,22 @@ namespace MyLeasing.Web.Data
     public class SeedDb
     {
         private readonly DataContext _context;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserHelper _userHelper;
         private Random _random;
 
-        public SeedDb(DataContext context, UserManager<User> userManager)
+        public SeedDb(DataContext context, IUserHelper userHelper)
         {
             _context = context;
-            _userManager = userManager;
+            _userHelper = userHelper;
             _random = new Random();
-
-
         }
 
         public async Task SeedAsync()
         {
             await _context.Database.EnsureCreatedAsync();
 
-            var user = await _userManager.FindByEmailAsync("tatiane.c.r.avellar@gmail.com");
+            var user = await _userHelper.GetUserByEmailAsync("tatiane.c.r.avellar@gmail.com");
+
             if(user == null) 
             {
                 user = new User
@@ -38,15 +37,16 @@ namespace MyLeasing.Web.Data
                     UserName = "tatiane.c.r.avellar@gmail.com",
                     Address= "Rua Qualquer",
                     PhoneNumber = "1234567890"
+
                 };
 
-                var result = await _userManager.CreateAsync(user, "123456");
+                var result = await _userHelper.AddUserAsync(user, "123456");
+
                 if(result!=IdentityResult.Success) 
                 {
                     throw new InvalidOperationException("Could not create the user in seeder.");
                 }
             }
-
 
             if (!_context.Owners.Any())
             {
@@ -60,6 +60,7 @@ namespace MyLeasing.Web.Data
                 AddOwner("Sandra", "Matos", "Rua 1º de Maio", user);
                 AddOwner("Felipe", "Reis", "Rua Bartolomeu Dias", user);
                 AddOwner("Ana", "Antunes", "Avenida da Liberdade", user);
+
                 await _context.SaveChangesAsync();
             }
 
