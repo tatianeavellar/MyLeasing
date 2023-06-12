@@ -5,7 +5,7 @@ namespace MyLeasing.Web.Data.Entities
 {
     public class Owner : IEntity
     {
-       
+
         public int Id { get; set; }
 
         [DisplayName("Document*")]
@@ -36,5 +36,24 @@ namespace MyLeasing.Web.Data.Entities
         public string OwnerName => $"{FirstName} {LastName}";
 
         public User User { get; set; }
+
+        [DisplayName("Image")]
+        public string ImageUrl { get; set; }
+
+        public string ImageFullPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(ImageUrl))
+                {
+                    return null;
+                }
+
+                return $"https://localhost:44334{ImageUrl.Substring(1)}";
+            }
+        }
     }
 }
+
+        
+  

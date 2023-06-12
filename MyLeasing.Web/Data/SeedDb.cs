@@ -26,16 +26,16 @@ namespace MyLeasing.Web.Data
         {
             await _context.Database.EnsureCreatedAsync();
 
-            var user = await _userManager.FindByEmailAsync("rafaasfs@gmail.com");
+            var user = await _userManager.FindByEmailAsync("tatiane.c.r.avellar@gmail.com");
             if(user == null) 
             {
                 user = new User
                 {
                     Document = "999999999",
-                    FirstName = "Rafael",
-                    LastName = "Santos",
-                    Email = "rafaasfs@gmail.com",
-                    UserName = "rafaasfs@gmail.com",
+                    FirstName = "Tatiane",
+                    LastName = "Avellar",
+                    Email = "tatiane.c.r.avellar@gmail.com",
+                    UserName = "tatiane.c.r.avellar@gmail.com",
                     Address= "Rua Qualquer",
                     PhoneNumber = "1234567890"
                 };
