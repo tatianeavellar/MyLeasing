@@ -51,7 +51,7 @@ namespace MyLeasing.Web
             services.AddScoped<IOwnerRepository, OwnerRepository>(); // Dependece Injection // AQUI TROCA PARA O QUE SERÁ IMPLEMENTADO
                                                                      // SAI O IREPOSITORY, REPOSITORY
 
-            //services.AddScoped<ILesseeRepository, LesseeRepository>();
+            services.AddScoped<ILesseeRepository, LesseeRepository>();
 
             services.AddControllersWithViews();
         }

@@ -8,17 +8,17 @@ namespace MyLeasing.Web.Data.Entities
     {
         public int Id { get; set; }
 
-        [DisplayName("Document*")]
+        [Display(Name = "Document*")]
         [MaxLength(20, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         [Required(ErrorMessage = "The field {0} is mandatory.")]
         public string Document { get; set; }
 
-        [DisplayName("First Name*")]
+        [Display(Name = "First Name*")]
         [MaxLength(50, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         [Required(ErrorMessage = "The field {0} is mandatory.")]
         public string FirstName { get; set; }
 
-        [DisplayName("Last Name*")]
+        [Display(Name = "Last Name*")]
         [MaxLength(50, ErrorMessage = "The {0} field can not have more than {1} characters.")]
         [Required(ErrorMessage = "The field {0} is mandatory.")]
         public string LastName { get; set; }

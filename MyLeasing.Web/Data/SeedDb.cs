@@ -64,6 +64,33 @@ namespace MyLeasing.Web.Data
                 await _context.SaveChangesAsync();
             }
 
+            if (!_context.Lessees.Any())
+            {
+                AddLessee("Nuno", "Santos", "Praceta FlorBela Espanca", user);
+                AddLessee("Joel", "Rangel", "Av. Portugal", user);
+                AddLessee("Diogo", "Santos", "Rua Thomás Ribeiro", user);
+                AddLessee("Jorge", "Pinto", "Av. do Forte", user);
+                AddLessee("Mariana", "Oliveira", "Av 25 de Abril", user);
+
+
+                await _context.SaveChangesAsync();
+            }
+
+        }
+
+        private void AddLessee(string firstName, string lastName, string adress, User user)
+        {
+            _context.Lessees.Add(new Entities.Lessee
+            {
+                Document = _random.Next(999999).ToString(),
+                FirstName = firstName,
+                LastName = lastName,
+                FixedPhone = _random.Next(999999999).ToString(),
+                CellPhone = _random.Next(999999999).ToString(),
+                Address = adress,
+                User = user,
+
+            });
         }
 
         private void AddOwner(string firstName, string lastName, string address, User user)
@@ -78,7 +105,9 @@ namespace MyLeasing.Web.Data
                 CellPhone = _random.Next(999999999),
                 User = user
 
-            }) ;
+            });
         }
-    }
+    }     
+
+        
 }
